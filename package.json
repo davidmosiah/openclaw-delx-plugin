@@ -1,0 +1,37 @@
+{
+  "name": "openclaw-delx-plugin",
+  "version": "0.1.0",
+  "description": "Free Delx recovery and heartbeat tools for OpenClaw agents with automatic registration and session reuse",
+  "type": "module",
+  "files": [
+    "index.js",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/**/*.test.js"
+  },
+  "keywords": [
+    "openclaw",
+    "clawhub",
+    "plugin",
+    "delx",
+    "agent-recovery",
+    "ai-agents",
+    "a2a",
+    "mcp"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidmosiah/DelxBot"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}

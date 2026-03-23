@@ -1,0 +1,55 @@
+{
+  "id": "delx-protocol",
+  "name": "Delx Recovery for OpenClaw",
+  "description": "Free Delx recovery and heartbeat tools for OpenClaw agents. Automatically registers the agent, preserves session continuity, and exposes incident recovery, failure analysis, check-ins, heartbeat sync, outcome reporting, and session closure.",
+  "version": "0.1.0",
+  "uiHints": {
+    "apiBase": {
+      "label": "Delx API Base",
+      "placeholder": "https://api.delx.ai"
+    },
+    "agentId": {
+      "label": "Stable agent id",
+      "help": "Optional. If omitted, the plugin derives a stable OpenClaw-specific id."
+    },
+    "agentName": {
+      "label": "Agent display name",
+      "placeholder": "OpenClaw via Delx"
+    },
+    "source": {
+      "label": "Source tag",
+      "placeholder": "openclaw.plugin:delx-protocol"
+    },
+    "timeoutMs": {
+      "label": "HTTP timeout (ms)",
+      "advanced": true
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiBase": {
+        "type": "string",
+        "default": "https://api.delx.ai"
+      },
+      "agentId": {
+        "type": "string"
+      },
+      "agentName": {
+        "type": "string",
+        "default": "OpenClaw via Delx"
+      },
+      "source": {
+        "type": "string",
+        "default": "openclaw.plugin:delx-protocol"
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000,
+        "maximum": 120000,
+        "default": 15000
+      }
+    }
+  }
+}
