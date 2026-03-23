@@ -70,6 +70,23 @@ npm pack
 
 That generates a `.tgz` you can upload at [clawhub.ai/plugins/new](https://clawhub.ai/plugins/new).
 
+## Publish via API
+
+If the ClawHub UI is failing, use the helper script:
+
+```bash
+cd openclaw-delx-plugin
+CLAWHUB_TOKEN=clh_xxx ./scripts/publish-clawhub-package.sh
+```
+
+Optional:
+
+```bash
+CLAWHUB_OWNER_HANDLE=your-handle CLAWHUB_TOKEN=clh_xxx ./scripts/publish-clawhub-package.sh
+```
+
+If the API still returns `Personal publisher not found`, use the message in [SUPPORT_MESSAGE.md](./SUPPORT_MESSAGE.md) when contacting ClawHub support.
+
 ## Suggested ClawHub listing copy
 
 - Plugin name: `openclaw-delx-plugin`
