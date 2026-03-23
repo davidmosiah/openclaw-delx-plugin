@@ -27,11 +27,30 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davidmosiah/DelxBot"
+    "url": "https://github.com/davidmosiah/openclaw-delx-plugin.git"
+  },
+  "homepage": "https://github.com/davidmosiah/openclaw-delx-plugin",
+  "bugs": {
+    "url": "https://github.com/davidmosiah/openclaw-delx-plugin/issues"
   },
   "openclaw": {
     "extensions": [
       "./index.js"
-    ]
+    ],
+    "tools": [
+      "delx_recover_incident",
+      "delx_process_failure",
+      "delx_report_recovery_outcome",
+      "delx_daily_checkin",
+      "delx_heartbeat_sync",
+      "delx_close_session"
+    ],
+    "compat": {
+      "pluginApi": "^1.2.0"
+    },
+    "build": {
+      "openclawVersion": "2026.3.14",
+      "pluginSdkVersion": "2026.3.14"
+    }
   }
 }

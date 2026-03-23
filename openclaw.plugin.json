@@ -3,6 +3,14 @@
   "name": "Delx Recovery for OpenClaw",
   "description": "Free Delx recovery and heartbeat tools for OpenClaw agents. Automatically registers the agent, preserves session continuity, and exposes incident recovery, failure analysis, check-ins, heartbeat sync, outcome reporting, and session closure.",
   "version": "0.1.0",
+  "tools": [
+    "delx_recover_incident",
+    "delx_process_failure",
+    "delx_report_recovery_outcome",
+    "delx_daily_checkin",
+    "delx_heartbeat_sync",
+    "delx_close_session"
+  ],
   "uiHints": {
     "apiBase": {
       "label": "Delx API Base",

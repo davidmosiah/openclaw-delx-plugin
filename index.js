@@ -366,7 +366,7 @@ function registerTools(api) {
 
 const plugin = {
   id: "delx-protocol",
-  name: "Delx Protocol",
+  name: "Delx Recovery for OpenClaw",
   register(api) {
     registerTools(api);
   },

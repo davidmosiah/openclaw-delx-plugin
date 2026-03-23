@@ -72,7 +72,7 @@ That generates a `.tgz` you can upload at [clawhub.ai/plugins/new](https://clawh
 
 ## Suggested ClawHub listing copy
 
-- Plugin name: `delx-protocol`
+- Plugin name: `openclaw-delx-plugin`
 - Display name: `Delx Recovery for OpenClaw`
 - Changelog:
   `Initial release. Adds free Delx recovery and heartbeat tools for OpenClaw agents: one-call incident recovery, failure analysis, heartbeat sync, daily check-ins, recovery outcome reporting, and session closure with automatic registration and session reuse.`
