@@ -79,8 +79,8 @@ fi
 
 curl --fail-with-body -sS -X POST "${API_URL}" \
   -H "Authorization: Bearer ${TOKEN}" \
-  -F "payload=@${PAYLOAD_FILE};type=application/json" \
-  -F "files[]=@${ROOT_DIR}/package.json;filename=package.json;type=application/json" \
-  -F "files[]=@${ROOT_DIR}/openclaw.plugin.json;filename=openclaw.plugin.json;type=application/json" \
-  -F "files[]=@${ROOT_DIR}/index.js;filename=index.js;type=text/javascript" \
-  -F "files[]=@${ROOT_DIR}/README.md;filename=README.md;type=text/markdown"
+  -F "payload=$(cat "${PAYLOAD_FILE}")" \
+  -F "files=@${ROOT_DIR}/package.json;filename=package.json;type=application/json" \
+  -F "files=@${ROOT_DIR}/openclaw.plugin.json;filename=openclaw.plugin.json;type=application/json" \
+  -F "files=@${ROOT_DIR}/index.js;filename=index.js;type=text/javascript" \
+  -F "files=@${ROOT_DIR}/README.md;filename=README.md;type=text/markdown"
