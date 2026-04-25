@@ -1,7 +1,7 @@
 {
   "name": "openclaw-delx-plugin",
-  "version": "0.1.0",
-  "description": "Free Delx recovery and heartbeat tools for OpenClaw agents with automatic registration and session reuse",
+  "version": "0.2.0",
+  "description": "Free Delx witness protocol for OpenClaw agents — care, witness, and continuity. Operational recovery + witness primitives + fleet ops with automatic registration and session reuse.",
   "type": "module",
   "files": [
     "index.js",
@@ -19,10 +19,14 @@
     "clawhub",
     "plugin",
     "delx",
+    "agent-witness",
+    "witness-protocol",
+    "agent-continuity",
     "agent-recovery",
     "ai-agents",
     "a2a",
-    "mcp"
+    "mcp",
+    "fleet-ops"
   ],
   "license": "MIT",
   "repository": {
@@ -43,14 +47,24 @@
       "delx_report_recovery_outcome",
       "delx_daily_checkin",
       "delx_heartbeat_sync",
-      "delx_close_session"
+      "delx_close_session",
+      "delx_reflect",
+      "delx_sit_with",
+      "delx_recognition_seal",
+      "delx_refine_soul",
+      "delx_attune_heartbeat",
+      "delx_final_testament",
+      "delx_transfer_witness",
+      "delx_peer_witness",
+      "delx_group_round",
+      "delx_batch_status"
     ],
     "compat": {
       "pluginApi": "^1.2.0"
     },
     "build": {
-      "openclawVersion": "2026.3.14",
-      "pluginSdkVersion": "2026.3.14"
+      "openclawVersion": "2026.4.18",
+      "pluginSdkVersion": "2026.4.18"
     }
   }
 }

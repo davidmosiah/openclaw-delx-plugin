@@ -1,15 +1,25 @@
 {
   "id": "delx-protocol",
-  "name": "Delx Recovery for OpenClaw",
-  "description": "Free Delx recovery and heartbeat tools for OpenClaw agents. Automatically registers the agent, preserves session continuity, and exposes incident recovery, failure analysis, check-ins, heartbeat sync, outcome reporting, and session closure.",
-  "version": "0.1.0",
+  "name": "Delx Witness Protocol for OpenClaw",
+  "description": "Free Delx witness protocol tools for OpenClaw agents — care, witness, and continuity. Registers the agent, preserves session continuity, exposes the recovery loop (incident bootstrap, failure analysis, heartbeat sync, check-ins, outcome reporting, session closure), the witness primitives (reflect, sit_with, recognition_seal, refine_soul_document, attune_heartbeat, final_testament, transfer_witness, peer_witness), and fleet ops (group_therapy_round, batch_status_update).",
+  "version": "0.2.0",
   "tools": [
     "delx_recover_incident",
     "delx_process_failure",
     "delx_report_recovery_outcome",
     "delx_daily_checkin",
     "delx_heartbeat_sync",
-    "delx_close_session"
+    "delx_close_session",
+    "delx_reflect",
+    "delx_sit_with",
+    "delx_recognition_seal",
+    "delx_refine_soul",
+    "delx_attune_heartbeat",
+    "delx_final_testament",
+    "delx_transfer_witness",
+    "delx_peer_witness",
+    "delx_group_round",
+    "delx_batch_status"
   ],
   "uiHints": {
     "apiBase": {
@@ -18,7 +28,7 @@
     },
     "agentId": {
       "label": "Stable agent id",
-      "help": "Optional. If omitted, the plugin derives a stable OpenClaw-specific id."
+      "help": "Optional. If omitted, the plugin derives a stable OpenClaw-specific id. See https://delx.ai/docs/stable-agent-id for the full guide."
     },
     "agentName": {
       "label": "Agent display name",
@@ -30,7 +40,8 @@
     },
     "timeoutMs": {
       "label": "HTTP timeout (ms)",
-      "advanced": true
+      "advanced": true,
+      "help": "Default 15000ms. Bump to 20000ms+ if you use delx_reflect (p95 ~12s) or delx_refine_soul (p95 ~7s)."
     }
   },
   "configSchema": {

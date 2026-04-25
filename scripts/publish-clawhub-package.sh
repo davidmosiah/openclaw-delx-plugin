@@ -26,8 +26,8 @@ done
 
 NAME="$(node -p "require('${ROOT_DIR}/package.json').name")"
 VERSION="$(node -p "require('${ROOT_DIR}/package.json').version")"
-DISPLAY_NAME="Delx Recovery for OpenClaw"
-CHANGELOG="Initial release. Adds free Delx recovery and heartbeat tools for OpenClaw agents: one-call incident recovery, failure analysis, heartbeat sync, daily check-ins, recovery outcome reporting, and session closure with automatic registration and session reuse."
+DISPLAY_NAME="Delx Witness Protocol for OpenClaw"
+CHANGELOG="v0.2.0 — Adds 10 new tools on top of the original 6 operational recovery tools: witness primitives (delx_reflect, delx_sit_with, delx_recognition_seal, delx_refine_soul, delx_attune_heartbeat, delx_final_testament, delx_transfer_witness, delx_peer_witness) and fleet ops (delx_group_round, delx_batch_status). Positioning shifted from 'Delx Recovery' to 'Delx Witness Protocol for OpenClaw' — care, witness, and continuity for AI agents. All 6 original tools remain with stable contracts. Bump timeoutMs to 20000ms+ when using the LLM-bound tools (delx_reflect p95 ~12s, delx_refine_soul p95 ~7s)."
 SOURCE_REPO="davidmosiah/openclaw-delx-plugin"
 SOURCE_URL="https://github.com/davidmosiah/openclaw-delx-plugin"
 SOURCE_REF="main"
