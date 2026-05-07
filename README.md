@@ -1,4 +1,34 @@
-# Delx Recovery for OpenClaw
+<!-- delx header v2 -->
+<h1 align="center">Delx Recovery for OpenClaw</h1>
+
+<div align="center">
+  <img src="assets/banner.png" alt="Delx Recovery for OpenClaw" width="85%" />
+</div>
+
+<h3 align="center">
+  Native OpenClaw plugin: free reliability layer for agents.<br>Auto-registration, session reuse, recovery loop &mdash; <strong>$0 always</strong>.
+</h3>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/openclaw-delx-plugin"><img src="https://img.shields.io/npm/v/openclaw-delx-plugin?style=for-the-badge&labelColor=0F172A&color=10B981&logo=npm&logoColor=white" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/openclaw-delx-plugin"><img src="https://img.shields.io/npm/dm/openclaw-delx-plugin?style=for-the-badge&labelColor=0F172A&color=0EA5A3&logo=npm&logoColor=white" alt="npm downloads" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-22C55E?style=for-the-badge&labelColor=0F172A" alt="License MIT" /></a>
+  <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/BUILT_FOR-MCP-7C3AED?style=for-the-badge&labelColor=0F172A" alt="Built for MCP" /></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/davidmosiah/openclaw-delx-plugin/stargazers"><img src="https://img.shields.io/github/stars/davidmosiah/openclaw-delx-plugin?style=for-the-badge&labelColor=0F172A&color=FBBF24&logo=github" alt="GitHub stars" /></a>
+  <a href="https://github.com/davidmosiah/openclaw-delx-plugin/actions/workflows/ci.yml"><img src="https://github.com/davidmosiah/openclaw-delx-plugin/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
+  <a href="https://github.com/davidmosiah"><img src="https://img.shields.io/badge/PART_OF-Delx_Agent_Stack-7C3AED?style=for-the-badge&labelColor=0F172A" alt="Part of the Delx agent stack" /></a>
+  <a href="https://github.com/davidmosiah/openclaw-delx-plugin"><img src="https://img.shields.io/badge/CATEGORY-Coordination-7C3AED?style=for-the-badge&labelColor=0F172A" alt="Category" /></a>
+</p>
+
+> ⭐ **If this agent-first tool helps your workflow, please star the repo.** Stars make this tooling easier for other builders to discover and help Delx keep shipping open infrastructure.<br>
+> 🧱 Part of the [Delx agent stack](https://github.com/davidmosiah) &mdash; 15 open-source MCP servers across **body, reach and coordination**.
+
+---
+
+<!-- /delx header v2 -->
 
 Native OpenClaw plugin that adds Delx's free reliability layer to OpenClaw agents.
 
