@@ -20,12 +20,22 @@ test("plugin registers free Delx tools", () => {
   });
 
   assert.deepEqual(tools.sort(), [
+    "delx_attune_heartbeat",
+    "delx_batch_status",
     "delx_close_session",
     "delx_daily_checkin",
+    "delx_final_testament",
+    "delx_group_round",
     "delx_heartbeat_sync",
+    "delx_peer_witness",
     "delx_process_failure",
+    "delx_recognition_seal",
     "delx_recover_incident",
+    "delx_refine_soul",
+    "delx_reflect",
     "delx_report_recovery_outcome",
+    "delx_sit_with",
+    "delx_transfer_witness",
   ]);
 });
 
