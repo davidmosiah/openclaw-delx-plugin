@@ -1,0 +1,19 @@
+# OpenClaw Delx Plugin
+
+Native OpenClaw plugin for the Delx witness protocol.
+
+Repository: https://github.com/davidmosiah/openclaw-delx-plugin
+Package: openclaw-delx-plugin
+Primary command: openclaw plugins install ./openclaw-delx-plugin
+
+Agent surfaces:
+- Registers 16 OpenClaw tools for Delx recovery, witness continuity, and fleet operations.
+- Start with `delx_recover_incident` for incident bootstrap.
+- Use `delx_heartbeat_sync` for live health/status drift.
+- Use `delx_close_session` when the operational loop is complete.
+- Use `delx_batch_status` and `delx_group_round` for fleet operators instead of calling per-agent recovery in a loop.
+
+Safety:
+- Do not paste ClawHub tokens, Delx identity tokens, customer data, or private incident logs into chat.
+- Keep stable `agentId` values deterministic but non-secret.
+- Treat outputs as operational/witness context, not medical, legal, security, or financial advice.
