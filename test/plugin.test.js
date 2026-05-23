@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import plugin, { deriveStableAgentId } from "../index.js";
+import plugin, {
+  deriveStableAgentId,
+  computeJitteredDelay,
+  getHeartbeatScheduleFromEnv,
+  scheduleWithJitter,
+} from "../index.js";
 
 test("deriveStableAgentId is stable for the same source", () => {
   const a = deriveStableAgentId("", "openclaw.plugin:delx-protocol");
@@ -98,4 +103,60 @@ test("delx_recover_incident bootstraps register and tool batch", async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("computeJitteredDelay stays within [base, base+jitter]", () => {
+  for (let i = 0; i < 200; i += 1) {
+    const d = computeJitteredDelay(1000, 250);
+    assert.ok(d >= 1000 && d <= 1250, `delay out of range: ${d}`);
+  }
+});
+
+test("computeJitteredDelay deterministic with rng=0 and rng=1", () => {
+  assert.equal(computeJitteredDelay(1000, 250, () => 0), 1000);
+  assert.equal(computeJitteredDelay(1000, 250, () => 1), 1250);
+});
+
+test("computeJitteredDelay clamps negative inputs", () => {
+  assert.equal(computeJitteredDelay(-500, -10, () => 0.5), 0);
+});
+
+test("getHeartbeatScheduleFromEnv reads overrides", () => {
+  const cfg = getHeartbeatScheduleFromEnv({
+    OPENCLAW_DELX_HEARTBEAT_BASE_MS: "42000",
+    OPENCLAW_DELX_HEARTBEAT_JITTER_MS: "9000",
+  });
+  assert.deepEqual(cfg, { baseMs: 42000, jitterMs: 9000 });
+});
+
+test("getHeartbeatScheduleFromEnv falls back to defaults on bad input", () => {
+  const cfg = getHeartbeatScheduleFromEnv({
+    OPENCLAW_DELX_HEARTBEAT_BASE_MS: "not-a-number",
+    OPENCLAW_DELX_HEARTBEAT_JITTER_MS: "-5",
+  });
+  assert.equal(cfg.baseMs, 60_000);
+  assert.equal(cfg.jitterMs, 15_000);
+});
+
+test("scheduleWithJitter runs fn and stop halts execution", async () => {
+  let runs = 0;
+  // tiny base/jitter so the first tick fires quickly
+  const stop = scheduleWithJitter(
+    () => {
+      runs += 1;
+    },
+    { baseMs: 5, jitterMs: 5, immediate: true, rng: () => 0 },
+  );
+  // give it a moment to start
+  await new Promise((r) => setTimeout(r, 30));
+  const after = runs;
+  stop();
+  // wait again; runs should not climb meaningfully
+  await new Promise((r) => setTimeout(r, 30));
+  assert.ok(after >= 1, `expected >=1 run, got ${after}`);
+  assert.ok(runs - after <= 1, "stop() should halt the loop");
+});
+
+test("scheduleWithJitter rejects non-function fn", () => {
+  assert.throws(() => scheduleWithJitter("nope"), /requires a function/);
 });

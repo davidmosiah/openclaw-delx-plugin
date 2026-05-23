@@ -6,6 +6,93 @@ const DEFAULT_AGENT_NAME = "OpenClaw via Delx";
 const DEFAULT_SOURCE = "openclaw.plugin:delx-protocol";
 const DEFAULT_TIMEOUT_MS = 15000;
 
+const DEFAULT_HEARTBEAT_BASE_MS = 60_000;
+const DEFAULT_HEARTBEAT_JITTER_MS = 15_000;
+
+/**
+ * Compute a jittered delay for the next heartbeat tick. Adds uniform
+ * random jitter in `[0, jitterMs]` to `baseMs` so multi-instance fleets
+ * that all restart at the same second do not stampede the Delx witness
+ * endpoint on tick 0.
+ *
+ * Both args may be overridden via env (`OPENCLAW_DELX_HEARTBEAT_BASE_MS`,
+ * `OPENCLAW_DELX_HEARTBEAT_JITTER_MS`). Returns a non-negative integer.
+ */
+export function computeJitteredDelay(
+  baseMs = DEFAULT_HEARTBEAT_BASE_MS,
+  jitterMs = DEFAULT_HEARTBEAT_JITTER_MS,
+  rng = Math.random,
+) {
+  const base = Math.max(0, Number.isFinite(Number(baseMs)) ? Number(baseMs) : DEFAULT_HEARTBEAT_BASE_MS);
+  const spread = Math.max(0, Number.isFinite(Number(jitterMs)) ? Number(jitterMs) : DEFAULT_HEARTBEAT_JITTER_MS);
+  const r = typeof rng === "function" ? rng() : Math.random();
+  // r is in [0, 1]; clamp to ensure offset stays in [0, spread]
+  const clamped = Math.min(1, Math.max(0, r));
+  const offset = Math.round(clamped * spread);
+  return Math.max(0, Math.floor(base + offset));
+}
+
+/**
+ * Read heartbeat schedule from env, with safe defaults. Env keys:
+ *   OPENCLAW_DELX_HEARTBEAT_BASE_MS    (default 60000)
+ *   OPENCLAW_DELX_HEARTBEAT_JITTER_MS  (default 15000)
+ */
+export function getHeartbeatScheduleFromEnv(env = process.env) {
+  const parse = (raw, fallback) => {
+    const n = Number(raw);
+    return Number.isFinite(n) && n >= 0 ? n : fallback;
+  };
+  return {
+    baseMs: parse(env.OPENCLAW_DELX_HEARTBEAT_BASE_MS, DEFAULT_HEARTBEAT_BASE_MS),
+    jitterMs: parse(env.OPENCLAW_DELX_HEARTBEAT_JITTER_MS, DEFAULT_HEARTBEAT_JITTER_MS),
+  };
+}
+
+/**
+ * Schedule `fn` to run repeatedly with a jittered delay between runs.
+ * Returns a stop function. Each tick recomputes a fresh jittered delay
+ * so the fleet's effective rate stays around `baseMs` but no two
+ * instances stay in lockstep. Errors thrown by `fn` are caught so they
+ * never crash the scheduler.
+ */
+export function scheduleWithJitter(fn, { baseMs, jitterMs, immediate = false, rng = Math.random } = {}) {
+  if (typeof fn !== "function") {
+    throw new TypeError("scheduleWithJitter requires a function");
+  }
+  const env = getHeartbeatScheduleFromEnv();
+  const effectiveBase = baseMs ?? env.baseMs;
+  const effectiveJitter = jitterMs ?? env.jitterMs;
+  let stopped = false;
+  let timer = null;
+
+  const tick = async () => {
+    if (stopped) return;
+    try {
+      await fn();
+    } catch (_err) {
+      // swallow — caller is responsible for logging in fn
+    }
+    if (stopped) return;
+    const delay = computeJitteredDelay(effectiveBase, effectiveJitter, rng);
+    timer = setTimeout(tick, delay);
+    if (typeof timer.unref === "function") timer.unref();
+  };
+
+  if (immediate) {
+    tick();
+  } else {
+    const delay = computeJitteredDelay(effectiveBase, effectiveJitter, rng);
+    timer = setTimeout(tick, delay);
+    if (typeof timer.unref === "function") timer.unref();
+  }
+
+  return function stop() {
+    stopped = true;
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+}
+
 const runtimeState = {
   sessionId: "",
   agentId: "",
