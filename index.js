@@ -111,11 +111,20 @@ function normalizeApiBase(value) {
 }
 
 function sanitizeSegment(value) {
-  return trimString(value)
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+  const text = trimString(value).toLowerCase();
+  let out = "";
+  let lastWasDash = false;
+  for (const ch of text) {
+    const isSafe = (ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9");
+    if (isSafe) {
+      out += ch;
+      lastWasDash = false;
+    } else if (!lastWasDash && out.length > 0) {
+      out += "-";
+      lastWasDash = true;
+    }
+  }
+  return out.endsWith("-") ? out.slice(0, -1) : out;
 }
 
 export function deriveStableAgentId(explicitAgentId = "", source = DEFAULT_SOURCE) {
