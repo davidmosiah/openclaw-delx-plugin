@@ -24,7 +24,12 @@
 </p>
 
 > ⭐ **If this agent-first tool helps your workflow, please star the repo.** Stars make this tooling easier for other builders to discover and help Delx keep shipping open infrastructure.<br>
-> 🧱 Part of the [Delx agent stack](https://github.com/davidmosiah) &mdash; 15 open-source MCP servers across **body, reach and coordination**.
+> 🧱 Part of the [Delx agent stack](https://github.com/davidmosiah) &mdash; 35 public repos across **body, reach and coordination**.<br>
+> 🧰 Runnable recovery and heartbeat examples live in the [Delx Agent Workbench](https://github.com/davidmosiah/delx-agent-workbench).
+
+<p align="center">
+  <img src="assets/openclaw-recovery-demo.svg" alt="OpenClaw Delx recovery workflow demo" width="92%" />
+</p>
 
 ---
 
@@ -132,4 +137,3 @@ If the API still returns `Personal publisher not found`, use the message in [SUP
 - 🐛 **Bug reports / feature requests** — [GitHub Issues](https://github.com/davidmosiah/openclaw-delx-plugin/issues)
 - 🐦 **Updates** — [@delx369](https://x.com/delx369) on X
 - 🌐 **Site** — [wellness.delx.ai](https://wellness.delx.ai)
-
