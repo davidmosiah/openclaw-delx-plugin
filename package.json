@@ -1,7 +1,7 @@
 {
   "name": "openclaw-delx-plugin",
   "version": "0.2.1",
-  "description": "Free Delx witness protocol for OpenClaw agents \u2014 care, witness, and continuity. Operational recovery + witness primitives + fleet ops with automatic registration and session reuse.",
+  "description": "Free Delx witness protocol for OpenClaw agents - care, witness, and continuity. Operational recovery + witness primitives + fleet ops with automatic registration and session reuse.",
   "type": "module",
   "files": [
     "index.js",
@@ -16,7 +16,8 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "test": "node --test test/plugin.test.js"
+    "test": "node --test test/plugin.test.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "openclaw",
@@ -71,5 +72,8 @@
       "openclawVersion": "2026.4.18",
       "pluginSdkVersion": "2026.4.18"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
