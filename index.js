@@ -106,8 +106,14 @@ function trimString(value, fallback = "") {
   return text || fallback;
 }
 
+function trimTrailingSlashes(value) {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === "/") end -= 1;
+  return value.slice(0, end);
+}
+
 function normalizeApiBase(value) {
-  return trimString(value, DEFAULT_API_BASE).replace(/\/+$/, "");
+  return trimTrailingSlashes(trimString(value, DEFAULT_API_BASE));
 }
 
 function sanitizeSegment(value) {
