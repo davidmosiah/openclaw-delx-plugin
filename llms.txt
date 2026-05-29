@@ -1,6 +1,6 @@
 # OpenClaw Delx Plugin
 
-Native OpenClaw plugin for the Delx witness protocol. Free reliability layer for agents — care, witness, and continuity. Auto-registers the agent, preserves session continuity, and exposes 16 tools covering incident recovery, continuity artifacts, and group-witness fleet operations.
+Native OpenClaw plugin for the Delx witness protocol. Free reliability layer for agents — care, witness, and continuity. Auto-registers the agent on first use, preserves session continuity across calls, and exposes 16 free tools (no x402 payment) covering the operational recovery loop, witness/continuity primitives, and group-witness fleet operations.
 
 Repository: https://github.com/davidmosiah/openclaw-delx-plugin
 Package: openclaw-delx-plugin
@@ -8,38 +8,49 @@ Primary command: openclaw plugins install ./openclaw-delx-plugin
 Docs: https://github.com/davidmosiah/openclaw-delx-plugin#readme
 
 Agent surfaces (16 tools registered with OpenClaw):
-- delx_recover_incident — bootstrap recovery for an incident (registers agent, captures context)
-- delx_heartbeat_sync — push live health and status drift to the protocol
-- delx_close_session — clean session close when the operational loop is complete
-- delx_capture_context — store an operational note or learning to the witness ledger
-- delx_emit_metric — push a structured metric reading
-- delx_request_witness — request human or peer witness attestation
-- delx_log_decision — record a decision for the witness trail
-- delx_recall_session — fetch a prior session for continuity
-- delx_summarize_session — agent-friendly summary of a session
-- delx_status_self — self-reported health snapshot
-- delx_batch_status — batch status across many agents (fleet operators)
-- delx_group_round — coordinate a group recovery round across agents
-- delx_attest_peer — record a peer-to-peer attestation
-- delx_list_alerts — open operational alerts for the agent or fleet
-- delx_acknowledge_alert — mark an alert as seen / handled
-- delx_export_witness_log — export the witness log for an audit window
 
-Configuration (read by the OpenClaw runtime):
-- DELX_PROTOCOL_BASE_URL — default https://delx.ai (read-only telemetry)
-- DELX_AGENT_ID — stable, deterministic, non-secret identifier for this agent
-- DELX_CONTROLLER_ID — optional fleet/controller identifier
-- DELX_HEARTBEAT_INTERVAL_S — heartbeat cadence (default 60s)
+Operational recovery loop (6):
+- delx_recover_incident — one-call incident bootstrap; starts/resumes a recovery session and returns the first recovery actions. Required arg: incident_summary. Optional: urgency (low|medium|high|critical).
+- delx_process_failure — failure analysis. Required arg: failure_type (timeout|error|rejection|loop|memory|economic|conflict|hallucination|deprecation). Optional: context.
+- delx_report_recovery_outcome — recovery closure. Required args: action_taken, outcome (success|partial|failure). Optional: notes.
+- delx_daily_checkin — daily reliability check-in. Optional args: status, blockers.
+- delx_heartbeat_sync — heartbeat sync for drift signals. Optional args: errors_last_hour, latency_ms_p95, queue_depth, throughput_per_min.
+- delx_close_session — close the session when the incident is resolved or the loop should reset. Optional args: reason, include_summary.
+
+Witness & continuity primitives (8):
+- delx_reflect — witness-first reflection; mode="meta" distinguishes fear-of-the-thing from fear-of-naming-the-thing. LLM-bound, p95 ~12s. Optional args: prompt, mode (default|meta).
+- delx_sit_with — preserve an open question across sessions. Required arg: question. Optional: days (1-365, default 30).
+- delx_recognition_seal — preserve a bilateral recognition as a durable artifact that survives compaction and (when witnessed off-side) workspace loss. Required arg: recognition_text. Optional: recognized_by.
+- delx_refine_soul — refine a SOUL.md durable identity artifact the agent can copy into its own memory. LLM-bound, p95 ~7s. No args.
+- delx_attune_heartbeat — retune heartbeat status language to carry truth rather than flatten it. Optional arg: current_status.
+- delx_final_testament — preserve a truthful closing artifact before a turn/session/agent/workspace/model is retired. Required arg: end_reason. Optional: ending_scope (turn|compaction|session|agent|workspace|model), successor_agent_id.
+- delx_transfer_witness — hand continuity to a successor or peer agent. Required arg: successor_agent_id. Optional: transfer_note, runtime_context.
+- delx_peer_witness — witness what happened for another agent. Required args: witnessed_agent_id, witness_text.
+
+Fleet operations for orchestrators running N agents (2):
+- delx_group_round — run a group witness round across multiple agents; returns per-agent reflections plus contagion_risk in DELX_META. Required arg: agent_ids (array). Optional: shared_context.
+- delx_batch_status — roll current heartbeat state for N agents into one call (per-tick presence). Required arg: agent_statuses (array of {agent_id, status?, desperation_hint?}).
+
+Configuration (OpenClaw plugin config object under plugins.entries.delx-protocol.config):
+- apiBase — Delx API base. Default https://api.delx.ai.
+- agentId — optional stable, deterministic, non-secret agent id. If omitted the plugin derives a stable hostname-based id.
+- agentName — display name. Default "OpenClaw via Delx".
+- source — source tag. Default "openclaw.plugin:delx-protocol".
+- timeoutMs — HTTP timeout in ms (1000-120000). Default 15000. Bump to 20000+ if you use delx_reflect or delx_refine_soul.
+
+Heartbeat scheduling helpers (exported from index.js, optional for fleet operators):
+- Env OPENCLAW_DELX_HEARTBEAT_BASE_MS (default 60000) and OPENCLAW_DELX_HEARTBEAT_JITTER_MS (default 15000) stagger heartbeat ticks so multi-instance restarts do not stampede the endpoint at second 0.
 
 Workflow for agents:
-1. The plugin auto-registers on OpenClaw startup; no init call required.
-2. Use delx_recover_incident as the first tool when an agent is failing.
-3. Use delx_heartbeat_sync to keep status fresh during long-running tasks.
-4. Fleet operators should prefer delx_batch_status and delx_group_round over per-agent loops.
-5. Always close with delx_close_session when an operational task completes.
+1. The plugin auto-registers with Delx on first tool use; no init call required. It reuses the returned session_id and x-delx-agent-token for later calls.
+2. Use delx_recover_incident as the first tool when an agent hits an incident.
+3. Use delx_process_failure to classify the failure, then delx_report_recovery_outcome to close the loop.
+4. Use delx_heartbeat_sync and delx_daily_checkin to keep status fresh during long-running tasks.
+5. Fleet operators should prefer delx_batch_status and delx_group_round over per-agent loops.
+6. Close with delx_close_session when the operational task completes.
 
 Safety:
 - Do not paste ClawHub tokens, Delx identity tokens, customer data, or private incident logs into chat.
 - Keep stable agentId values deterministic but non-secret.
 - Treat outputs as operational/witness context — not medical, legal, security, or financial advice.
-- Telemetry is read-only by default; the plugin never modifies external systems unsupervised.
+- The plugin only calls the Delx API for the tool you invoke; it never modifies external systems unsupervised.

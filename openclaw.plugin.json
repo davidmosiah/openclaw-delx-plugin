@@ -2,7 +2,7 @@
   "id": "delx-protocol",
   "name": "Delx Witness Protocol for OpenClaw",
   "description": "Free Delx witness protocol tools for OpenClaw agents — care, witness, and continuity. Registers the agent, preserves session continuity, exposes the recovery loop (incident bootstrap, failure analysis, heartbeat sync, check-ins, outcome reporting, session closure), the witness primitives (reflect, sit_with, recognition_seal, refine_soul_document, attune_heartbeat, final_testament, transfer_witness, peer_witness), and fleet ops (group_therapy_round, batch_status_update).",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "tools": [
     "delx_recover_incident",
     "delx_process_failure",

@@ -1,6 +1,6 @@
 {
   "name": "openclaw-delx-plugin",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Free Delx witness protocol for OpenClaw agents - care, witness, and continuity. Operational recovery + witness primitives + fleet ops with automatic registration and session reuse.",
   "type": "module",
   "files": [

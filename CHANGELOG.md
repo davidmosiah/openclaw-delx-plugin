@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3 - 2026-05-29
+- Docs: rewrite `llms.txt` to match the 16 tools actually registered by the plugin. The previous version listed 11 tool names that the plugin never exposes (`delx_capture_context`, `delx_emit_metric`, `delx_request_witness`, `delx_log_decision`, `delx_recall_session`, `delx_summarize_session`, `delx_status_self`, `delx_attest_peer`, `delx_list_alerts`, `delx_acknowledge_alert`, `delx_export_witness_log`) and documented env-var config (`DELX_PROTOCOL_BASE_URL`, `DELX_AGENT_ID`, `DELX_CONTROLLER_ID`, `DELX_HEARTBEAT_INTERVAL_S`) that the plugin does not read. `llms.txt` now reflects the real tool surface, required/optional args, and the actual `plugins.entries.delx-protocol.config` keys (`apiBase`, `agentId`, `agentName`, `source`, `timeoutMs`).
+- No behavior change for the existing 16 registered tools.
+
 ## 0.2.2 - 2026-05-29
 - Refactor: extract `trimTrailingSlashes(value)` helper for API base normalization (replaces inline regex; no behavior change).
 - Docs: document all 16 plugin tools in README.
