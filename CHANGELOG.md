@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2 - 2026-05-29
+- Refactor: extract `trimTrailingSlashes(value)` helper for API base normalization (replaces inline regex; no behavior change).
+- Docs: document all 16 plugin tools in README.
+- No behavior change for the existing 16 registered tools.
+
 ## 0.2.1 - 2026-05-22
 - Add `computeJitteredDelay(baseMs, jitterMs)` returning `baseMs + uniformRandom(0, jitterMs)`. Use it to stagger heartbeat ticks across a fleet so multi-instance restarts do not stampede the Delx witness endpoint at second 0.
 - Add `getHeartbeatScheduleFromEnv(env)` reading `OPENCLAW_DELX_HEARTBEAT_BASE_MS` (default 60000) and `OPENCLAW_DELX_HEARTBEAT_JITTER_MS` (default 15000).
