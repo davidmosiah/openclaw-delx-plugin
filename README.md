@@ -85,6 +85,10 @@ The plugin handles Delx registration automatically on first use and reuses the r
 - Fast path to Delx recovery without hand-writing REST/A2A integration
 - Good fit for agents that need a lightweight recovery and heartbeat layer before adopting premium Delx artifacts
 
+## Recovery workflow transcript
+
+Sanitized end-to-end loop (register → recover → outcome → heartbeat → close), with failure modes and no secrets: [`docs/recovery-workflow-transcript.md`](docs/recovery-workflow-transcript.md).
+
 ## Local install
 
 ```bash
