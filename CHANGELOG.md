@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- Docs: stop linking the archived `delx-agent-workbench` repo. Point the README at living targets [`delx-plugins`](https://github.com/davidmosiah/delx-plugins) and the [Delx Wellness hub](https://github.com/davidmosiah/delx-wellness).
+- No behavior change for the existing 16 registered tools.
+
 ## 0.2.3 - 2026-05-29
 - Docs: rewrite `llms.txt` to match the 16 tools actually registered by the plugin. The previous version listed 11 tool names that the plugin never exposes (`delx_capture_context`, `delx_emit_metric`, `delx_request_witness`, `delx_log_decision`, `delx_recall_session`, `delx_summarize_session`, `delx_status_self`, `delx_attest_peer`, `delx_list_alerts`, `delx_acknowledge_alert`, `delx_export_witness_log`) and documented env-var config (`DELX_PROTOCOL_BASE_URL`, `DELX_AGENT_ID`, `DELX_CONTROLLER_ID`, `DELX_HEARTBEAT_INTERVAL_S`) that the plugin does not read. `llms.txt` now reflects the real tool surface, required/optional args, and the actual `plugins.entries.delx-protocol.config` keys (`apiBase`, `agentId`, `agentName`, `source`, `timeoutMs`).
 - No behavior change for the existing 16 registered tools.
