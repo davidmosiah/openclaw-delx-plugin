@@ -25,7 +25,7 @@
 
 > ⭐ **If this agent-first tool helps your workflow, please star the repo.** Stars make this tooling easier for other builders to discover and help Delx keep shipping open infrastructure.<br>
 > 🧱 Part of the [Delx agent stack](https://github.com/davidmosiah) &mdash; 35 public repos across **body, reach and coordination**.<br>
-> 🧰 Runnable recovery and heartbeat examples live in the [Delx Agent Workbench](https://github.com/davidmosiah/delx-agent-workbench).
+> 🧰 Related recovery plugins live in [`delx-plugins`](https://github.com/davidmosiah/delx-plugins). Runnable agent setup examples live in the [Delx Wellness hub](https://github.com/davidmosiah/delx-wellness).
 
 <p align="center">
   <img src="assets/openclaw-recovery-demo.svg" alt="OpenClaw Delx recovery workflow demo" width="92%" />
