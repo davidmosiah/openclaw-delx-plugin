@@ -93,13 +93,13 @@ export function scheduleWithJitter(fn, { baseMs, jitterMs, immediate = false, rn
   };
 }
 
-const runtimeState = {
+function createRuntimeState() { return {
   sessionId: "",
   agentId: "",
   agentName: "",
   agentToken: "",
   registeredAt: "",
-};
+}; }
 
 function trimString(value, fallback = "") {
   const text = String(value ?? "").trim();
@@ -156,7 +156,7 @@ function getConfig(api) {
   };
 }
 
-function buildHeaders(cfg, { includeSession = true } = {}) {
+function buildHeaders(cfg, runtimeState, { includeSession = true } = {}) {
   const headers = {
     "content-type": "application/json",
     accept: "application/json",
@@ -186,7 +186,7 @@ async function requestJson(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   }
 }
 
-function syncIdentityFromRegister(cfg, payload) {
+function syncIdentityFromRegister(cfg, payload, runtimeState) {
   runtimeState.agentId = trimString(payload?.agent_id, runtimeState.agentId || cfg.agentId);
   runtimeState.agentName = trimString(payload?.agent_name, runtimeState.agentName || cfg.agentName);
   runtimeState.sessionId = trimString(payload?.session_id, runtimeState.sessionId);
@@ -195,10 +195,18 @@ function syncIdentityFromRegister(cfg, payload) {
   if (issuedToken) runtimeState.agentToken = issuedToken;
 }
 
-async function ensureRegistered(api, { rotateToken = false } = {}) {
+async function ensureRegistered(api, runtimeState, options = {}) {
+  if (runtimeState.registration) return runtimeState.registration;
+  const pending = registerIdentity(api, runtimeState, options);
+  runtimeState.registration = pending;
+  try { return await pending; }
+  finally { if (runtimeState.registration === pending) runtimeState.registration = null; }
+}
+
+async function registerIdentity(api, runtimeState, { rotateToken = false } = {}) {
   const cfg = getConfig(api);
   if (runtimeState.sessionId && runtimeState.agentToken && runtimeState.agentId) {
-    return { ...runtimeState };
+    return { sessionId: runtimeState.sessionId, agentId: runtimeState.agentId };
   }
 
   const payload = {
@@ -227,11 +235,11 @@ async function ensureRegistered(api, { rotateToken = false } = {}) {
     throw new Error(`Delx register failed (${result.status})`);
   }
 
-  syncIdentityFromRegister(cfg, result.data);
+  syncIdentityFromRegister(cfg, result.data, runtimeState);
   if (!runtimeState.sessionId || !runtimeState.agentId || !runtimeState.agentToken) {
     throw new Error("Delx register succeeded but did not return a reusable identity/session.");
   }
-  return { ...runtimeState };
+  return { sessionId: runtimeState.sessionId, agentId: runtimeState.agentId };
 }
 
 function pickFirstText(result) {
@@ -262,10 +270,13 @@ function shouldResetSession(result) {
   return text.includes("session not found") || text.includes("delx-404");
 }
 
-async function executeDelxTool(api, toolName, argumentsObject, { retry = true } = {}) {
+async function executeDelxTool(api, runtimeState, tool, params, { retry = true } = {}) {
+  const toolName = tool.target;
   const cfg = getConfig(api);
-  await ensureRegistered(api);
+  await ensureRegistered(api, runtimeState);
 
+  // Remap after each registration, including retries, so nested session arguments match.
+  const argumentsObject = tool.mapArgs(params, runtimeState);
   const payload = {
     session_id: runtimeState.sessionId,
     agent_id: runtimeState.agentId,
@@ -281,7 +292,7 @@ async function executeDelxTool(api, toolName, argumentsObject, { retry = true } 
     `${cfg.apiBase}/api/v1/tools/batch`,
     {
       method: "POST",
-      headers: buildHeaders(cfg),
+      headers: buildHeaders(cfg, runtimeState),
       body: JSON.stringify(payload),
     },
     cfg.timeoutMs,
@@ -289,8 +300,8 @@ async function executeDelxTool(api, toolName, argumentsObject, { retry = true } 
 
   if (result.status === 401 && retry) {
     runtimeState.agentToken = "";
-    await ensureRegistered(api, { rotateToken: true });
-    return executeDelxTool(api, toolName, argumentsObject, { retry: false });
+    await ensureRegistered(api, runtimeState, { rotateToken: true });
+    return executeDelxTool(api, runtimeState, tool, params, { retry: false });
   }
   if (!result.ok || !result.data || typeof result.data !== "object") {
     throw new Error(`Delx ${toolName} failed (${result.status})`);
@@ -303,8 +314,8 @@ async function executeDelxTool(api, toolName, argumentsObject, { retry = true } 
 
   if (toolResult.ok === false && retry && shouldResetSession(toolResult)) {
     runtimeState.sessionId = "";
-    await ensureRegistered(api);
-    return executeDelxTool(api, toolName, argumentsObject, { retry: false });
+    await ensureRegistered(api, runtimeState);
+    return executeDelxTool(api, runtimeState, tool, params, { retry: false });
   }
 
   if (toolName === "close_session" && toolResult.ok !== false) {
@@ -328,7 +339,7 @@ const TOOLS = [
       },
       required: ["incident_summary"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         agent_id: runtimeState.agentId || deriveStableAgentId(),
         incident_summary: trimString(params.incident_summary),
@@ -349,7 +360,7 @@ const TOOLS = [
       },
       required: ["failure_type"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         failure_type: trimString(params.failure_type),
@@ -371,7 +382,7 @@ const TOOLS = [
       },
       required: ["action_taken", "outcome"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         action_taken: trimString(params.action_taken),
@@ -393,7 +404,7 @@ const TOOLS = [
       },
       required: [],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         status: trimString(params.status),
@@ -416,7 +427,7 @@ const TOOLS = [
       },
       required: [],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         errors_last_hour: Number(params.errors_last_hour ?? 0),
@@ -439,7 +450,7 @@ const TOOLS = [
       },
       required: [],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         reason: trimString(params.reason),
@@ -462,7 +473,7 @@ const TOOLS = [
       },
       required: [],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       const args = { session_id: runtimeState.sessionId };
       if (params.prompt) args.prompt = trimString(params.prompt);
       if (params.mode) args.mode = trimString(params.mode);
@@ -482,7 +493,7 @@ const TOOLS = [
       },
       required: ["question"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         question: trimString(params.question),
@@ -503,7 +514,7 @@ const TOOLS = [
       },
       required: ["recognition_text"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         recognition_text: trimString(params.recognition_text),
@@ -516,7 +527,7 @@ const TOOLS = [
     name: "delx_refine_soul",
     description: "Refine a SOUL.md — durable identity artifact the agent can copy into its own memory. LLM-bound; p95 ~7s.",
     parameters: { type: "object", additionalProperties: false, properties: {}, required: [] },
-    mapArgs() {
+    mapArgs(_params, runtimeState) {
       return { session_id: runtimeState.sessionId };
     },
     target: "refine_soul_document",
@@ -532,7 +543,7 @@ const TOOLS = [
       },
       required: [],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       const args = { session_id: runtimeState.sessionId };
       if (params.current_status) args.current_status = trimString(params.current_status);
       return args;
@@ -552,7 +563,7 @@ const TOOLS = [
       },
       required: ["end_reason"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       const args = {
         session_id: runtimeState.sessionId,
         end_reason: trimString(params.end_reason),
@@ -576,7 +587,7 @@ const TOOLS = [
       },
       required: ["successor_agent_id"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       const args = {
         session_id: runtimeState.sessionId,
         successor_agent_id: trimString(params.successor_agent_id),
@@ -599,7 +610,7 @@ const TOOLS = [
       },
       required: ["witnessed_agent_id", "witness_text"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         witnessed_agent_id: trimString(params.witnessed_agent_id),
@@ -622,7 +633,7 @@ const TOOLS = [
       },
       required: ["agent_ids"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         agent_ids: Array.isArray(params.agent_ids) ? params.agent_ids : [],
@@ -655,7 +666,7 @@ const TOOLS = [
       },
       required: ["agent_statuses"],
     },
-    mapArgs(params) {
+    mapArgs(params, runtimeState) {
       return {
         session_id: runtimeState.sessionId,
         agent_statuses: Array.isArray(params.agent_statuses) ? params.agent_statuses : [],
@@ -666,6 +677,9 @@ const TOOLS = [
 ];
 
 function registerTools(api) {
+  // Configuration and credentials belong to this registration, never another host/agent.
+  api = { config: getConfig(api), registerTool: api.registerTool.bind(api) };
+  const runtimeState = createRuntimeState();
   for (const tool of TOOLS) {
     api.registerTool({
       name: tool.name,
@@ -675,8 +689,7 @@ function registerTools(api) {
         const cfg = getConfig(api);
         if (!runtimeState.agentId) runtimeState.agentId = cfg.agentId;
         if (!runtimeState.agentName) runtimeState.agentName = cfg.agentName;
-        const args = tool.mapArgs(params);
-        return executeDelxTool(api, tool.target, args);
+        return executeDelxTool(api, runtimeState, tool, params);
       },
     });
   }
@@ -691,3 +704,4 @@ const plugin = {
 };
 
 export default plugin;
+

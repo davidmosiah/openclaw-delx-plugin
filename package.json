@@ -16,7 +16,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "test": "node --test test/plugin.test.js",
+    "test": "node --test test/plugin.test.js test/isolation.test.js",
     "prepublishOnly": "npm test"
   },
   "keywords": [
